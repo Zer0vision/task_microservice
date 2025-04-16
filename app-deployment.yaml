@@ -13,14 +13,32 @@ spec:
         app: task-microservice
     spec:
       containers:
-      - name: task-microservice
-        image: task-microservice:latest
-        imagePullPolicy: Never
+      - name: task-micro/service
+        image: zerovision/task-microservice:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         env:
         - name: PYTHONUNBUFFERED
           value: "1"
+        - name: DATABASE_URL
+          value: "mysql://user:password@mysql:3306/tasks"
+        readinessProbe:
+          httpGet:
+            path: /tasks
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        startupProbe:
+          tcpSocket:
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox
+        command: ['sh', '-c', 'until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done;']
 ---
 apiVersion: v1
 kind: Service
@@ -33,4 +51,4 @@ spec:
   - protocol: TCP
     port: 5000
     targetPort: 5000
-  type: ClusterIP
+  type: LoadBalancer
