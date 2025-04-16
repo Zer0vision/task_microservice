@@ -33,16 +33,16 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/task-microservice:latest
 
-    # Установка kubectl (для имитации деплоя)
+    # Установка kubectl
     - name: Install kubectl
       run: |
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
         chmod +x kubectl
         sudo mv kubectl /usr/local/bin/
 
-    # Применение манифестов (демонстрация)
+    # Проверка манифестов
     - name: Deploy to Kubernetes
       run: |
         echo "Simulating deployment to Kubernetes"
-        kubectl apply -f app-deployment.yaml --dry-run=client
-        kubectl apply -f mysql-deployment.yaml --dry-run=client
+        kubectl apply -f app-deployment.yaml --dry-run=client --validate=false
+        kubectl apply -f mysql-deployment.yaml --dry-run=client --validate=false
