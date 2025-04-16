@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task-microservice
+  template:
+    metadata:
+      labels:
+        app: task-microservice
+    spec:
+      containers:
+      - name: task-microservice
+        image: task-microservice:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-microservice
+spec:
+  selector:
+    app: task-microservice
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: ClusterIP
