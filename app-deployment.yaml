@@ -13,7 +13,7 @@ spec:
         app: task-microservice
     spec:
       containers:
-      - name: task-micro/service
+      - name: task-microservice
         image: zerovision/task-microservice:latest
         imagePullPolicy: Always
         ports:
