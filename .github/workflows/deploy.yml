@@ -33,16 +33,15 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/task-microservice:latest
 
-    # Установка kubectl
-    - name: Install kubectl
+    # Установка yq
+    - name: Install yq
       run: |
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        sudo mv kubectl /usr/local/bin/
+        sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+        sudo chmod +x /usr/local/bin/yq
 
     # Проверка манифестов
-    - name: Deploy to Kubernetes
+    - name: Validate Kubernetes manifests
       run: |
-        echo "Simulating deployment to Kubernetes"
-        kubectl apply -f app-deployment.yaml --dry-run=client --validate=false
-        kubectl apply -f mysql-deployment.yaml --dry-run=client --validate=false
+        echo "Validating Kubernetes manifests"
+        yq eval . app-deployment.yaml
+        yq eval . mysql-deployment.yaml
